@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/fileImageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:srcCompat="@drawable/folder_icon"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:id="@+id/fileInfoText"
+        android:text="File Info"
+        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="2dp"
+        android:layout_below="@+id/fileNameText"
+        android:layout_toRightOf="@+id/fileImageView"
+        android:layout_toEndOf="@+id/fileImageView"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:gravity="center_vertical"
+        android:fontFamily="sans-serif" />
+
+    <TextView
+        android:id="@+id/fileNameText"
+        android:text="File Name"
+        android:textStyle="normal|bold"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:gravity="center_vertical"
+        android:fontFamily="sans-serif"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_alignTop="@+id/fileImageView"
+        android:layout_alignLeft="@+id/fileInfoText"
+        android:layout_alignStart="@+id/fileInfoText" />
+
+</RelativeLayout>

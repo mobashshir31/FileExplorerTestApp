@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_connection"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.sunny.fileexplorertestapp.ConnectionActivity">
+    <EditText
+        android:id="@+id/servAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:digits="0123456789."
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:hint="Server Address" />
+
+    <!-- to only input numbers in the editText field the android:digits and android:inputType are used -->
+    <EditText
+        android:id="@+id/servPort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:digits="0123456789"
+        android:ems="10"
+        android:hint="Server Port"
+        android:layout_below="@+id/servAddress"
+        android:layout_marginTop="5dp"
+        android:layout_alignLeft="@+id/servAddress"
+        android:layout_alignStart="@+id/servAddress" />
+
+
+    <Button
+        android:id="@+id/connectButton"
+        android:text="Connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:layout_below="@+id/servPort"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="18sp" />
+
+</RelativeLayout>
