@@ -85,6 +85,7 @@ public class FileExpActivity extends AppCompatActivity {
         }
         else{
             if((lastBackPressed + TIME_INTERVAL_BACK_PRESS) > System.currentTimeMillis()){
+                clientService.disconnectFromServer();
                 super.onBackPressed();
                 return;
             }

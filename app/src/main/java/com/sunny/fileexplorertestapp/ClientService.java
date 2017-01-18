@@ -33,6 +33,10 @@ public class ClientService extends Service {
     public static final String EVENT_COMM_SUCCESS = "communication-event-successful";
     public static final String EVENT_COMM_FAIL = "communication-event-failure";
 
+    // An object to lock the service using synchronized() so that no two threads use the service
+    // and thereby the Sockets simultaneously
+    private final Object lockObject = new Object();
+
     public String getCurrDir() {
         return currDir;
     }
@@ -47,10 +51,25 @@ public class ClientService extends Service {
         connectThread.start();
     }
 
+    public void disconnectFromServer() {
+        synchronized (lockObject) {
+            try {
+                if (inputStream != null)
+                    inputStream.close();
+                if (outputStream != null)
+                    outputStream.close();
+                if (clientSocket != null)
+                    clientSocket.close();
+            } catch (IOException e) {
+                Log.i(TAG, "Error in Disconnecting");
+            }
+        }
+    }
+
     private boolean sendToServerUtil(RequestMessage message) throws IOException {
         String request = message.getRequest();
         String dir = message.getCurrentDir();
-        if(dir==null)
+        if (dir == null)
             dir = "";
         String name = message.getFileName();
         if (request.equals(RequestMessage.LIST_ROOTS)) {
@@ -66,53 +85,60 @@ public class ClientService extends Service {
             return false;
         return receiveFromServerUtil(request);
     }
+
     private boolean receiveFromServerUtil(String request) throws IOException {
         if (request.equals(RequestMessage.LIST_ROOTS) || request.equals(RequestMessage.NAVIGATE_PARENT)
-                || request.equals(RequestMessage.DISPLAY_DIRECTORY))
-        {
+                || request.equals(RequestMessage.DISPLAY_DIRECTORY)) {
             int count = inputStream.readInt();
-            Log.i(TAG, "Read: "+count);
+            Log.i(TAG, "Read: " + count);
             fileExpItemList.clear();
             String dir = inputStream.readUTF();
-            Log.i(TAG, "Read: "+dir);
-            if(dir.equals(""))
+            Log.i(TAG, "Read: " + dir);
+            if (dir.equals(""))
                 dir = null;
             currDir = dir;
             while (count > 0) {
                 String name = inputStream.readUTF();
-                Log.i(TAG, "Read: "+name);
+                Log.i(TAG, "Read: " + name);
                 boolean isDirectory = inputStream.readBoolean();
-                Log.i(TAG, "Read: "+isDirectory);
+                Log.i(TAG, "Read: " + isDirectory);
                 String info = inputStream.readUTF();
-                Log.i(TAG, "Read: "+info);
+                Log.i(TAG, "Read: " + info);
                 FileExpItem fileExpItem = new FileExpItem(name, isDirectory, info);
                 fileExpItemList.add(fileExpItem);
                 count--;
             }
             return true;
-        }
-        else if (request.equals(RequestMessage.EXEC_FILE))
+        } else if (request.equals(RequestMessage.EXEC_FILE))
             return true;
         else
             return false;
     }
+
     public void commWithServer(RequestMessage message) {
         CommunicateRunnable communicateRunnable = new CommunicateRunnable(message);
         Thread communicateThread = new Thread(communicateRunnable);
         communicateThread.start();
     }
 
-    private void sendMessageViaBroadcast(String action){
+    private void sendMessageViaBroadcast(String action) {
         Intent i = new Intent(action);
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
     }
-    private void sendMessageViaBroadcast(String action, String key, String message){
+
+    private void sendMessageViaBroadcast(String action, String key, String message) {
         Intent i = new Intent(action);
         i.putExtra(key, message);
         LocalBroadcastManager.getInstance(this).sendBroadcast(i);
     }
 
     public ClientService() {
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        disconnectFromServer();
     }
 
     @Override
@@ -138,45 +164,51 @@ public class ClientService extends Service {
 
         @Override
         public void run() {
-            //synchronized (this){
-            try {
-                Log.i(TAG, "Trying to connect");
-                clientSocket = new Socket(serverAddress, serverPort);
-                outputStream = new DataOutputStream(clientSocket.getOutputStream());
-                inputStream = new DataInputStream(clientSocket.getInputStream());
+            synchronized (lockObject) {
+                try {
+                    Log.i(TAG, "Trying to connect");
+                    clientSocket = new Socket(serverAddress, serverPort);
+                    outputStream = new DataOutputStream(clientSocket.getOutputStream());
+                    inputStream = new DataInputStream(clientSocket.getInputStream());
 
-                RequestMessage message = new RequestMessage(RequestMessage.LIST_ROOTS);
-                boolean success = sendToServerUtil(message);
-                if(success)
-                    sendMessageViaBroadcast(EVENT_CONNECTION_SUCCESS);
-                else
+                    RequestMessage message = new RequestMessage(RequestMessage.LIST_ROOTS);
+                    boolean success = sendToServerUtil(message);
+                    if (success)
+                        sendMessageViaBroadcast(EVENT_CONNECTION_SUCCESS);
+                    else
+                        sendMessageViaBroadcast(EVENT_CONNECTION_FAIL);
+                } catch (IOException e) {
+                    Log.i(TAG, "Connection failed");
                     sendMessageViaBroadcast(EVENT_CONNECTION_FAIL);
-            } catch (IOException e) {
-                Log.i(TAG, "Connection failed");
-                sendMessageViaBroadcast(EVENT_CONNECTION_FAIL);
+                }
             }
-            //}
 
         }
     }
-    private class CommunicateRunnable implements Runnable{
+
+    private class CommunicateRunnable implements Runnable {
         private RequestMessage message;
-        public CommunicateRunnable(RequestMessage message){
+
+        public CommunicateRunnable(RequestMessage message) {
             this.message = message;
         }
+
         @Override
         public void run() {
-            //synchronized (this){
-            try {
-                boolean success = sendToServerUtil(message);
-                if(success)
-                    sendMessageViaBroadcast(EVENT_COMM_SUCCESS, COMM_REQUEST, message.getRequest());
-                else
+            synchronized (lockObject) {
+                try {
+                    boolean success = sendToServerUtil(message);
+                    if (success)
+                        sendMessageViaBroadcast(EVENT_COMM_SUCCESS, COMM_REQUEST, message.getRequest());
+                    else {
+                        Log.i(TAG, "Communication failure");
+                        sendMessageViaBroadcast(EVENT_COMM_FAIL);
+                    }
+                } catch (IOException e) {
+                    Log.i(TAG, "Communication failure");
                     sendMessageViaBroadcast(EVENT_COMM_FAIL);
-            } catch (IOException e) {
-                sendMessageViaBroadcast(EVENT_COMM_FAIL);
+                }
             }
-            //}
 
         }
     }
