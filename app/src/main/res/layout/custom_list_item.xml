@@ -21,7 +21,7 @@
         android:id="@+id/fileInfoText"
         android:text="File Info"
         android:textSize="12sp"
-        android:layout_width="275dp"
+        android:layout_width="260dp"
         android:layout_height="15dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="2dp"
@@ -49,6 +49,6 @@
         android:maxHeight="35dp"
         android:maxLines="2"
         android:ellipsize="end"
-        android:layout_width="275dp" />
+        android:layout_width="260dp" />
 
 </RelativeLayout>

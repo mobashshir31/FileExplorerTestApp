@@ -105,6 +105,10 @@ public class ClientService extends Service {
                 String info = inputStream.readUTF();
                 Log.i(TAG, "Read: " + info);
                 FileExpItem fileExpItem = new FileExpItem(name, isDirectory, info);
+                if(!isDirectory){
+                    String fileType = inputStream.readUTF();
+                    fileExpItem.setFileType(fileType);
+                }
                 fileExpItemList.add(fileExpItem);
                 count--;
             }

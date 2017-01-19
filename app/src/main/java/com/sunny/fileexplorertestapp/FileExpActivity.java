@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -71,6 +72,13 @@ public class FileExpActivity extends AppCompatActivity {
         }
         else{
             action = RequestMessage.EXEC_FILE;
+            String type = item.getFileType();
+            if(type!=null&&type.startsWith("video/")){
+                AlertDialog dialog = new AlertDialog.Builder(FileExpActivity.this).create();
+                dialog.setTitle("Video File");
+                dialog.setMessage("Opened a video file");
+                dialog.show();
+            }
         }
         RequestMessage message = new RequestMessage(action, currDir, name);
         clientService.commWithServer(message);
@@ -143,8 +151,9 @@ public class FileExpActivity extends AppCompatActivity {
                     //to scroll to top
                     fileListView.setSelectionAfterHeaderView();
                 }
-                else if (request.equals(RequestMessage.EXEC_FILE))
+                else if (request.equals(RequestMessage.EXEC_FILE)){
                     return;
+                }
             }
             else if(event.equals(ClientService.EVENT_COMM_FAIL)){
                 Toast.makeText(FileExpActivity.this, "Communication Error!", Toast.LENGTH_LONG).show();

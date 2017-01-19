@@ -10,6 +10,7 @@ public class ServerCommUtility {
         private String name;
         private boolean directory;
         private String fileInfo;
+        private String fileType;
 
         public FileExpItem(String name, boolean directory,String fileInfo) {
             this.directory = directory;
@@ -24,6 +25,12 @@ public class ServerCommUtility {
         }
         public String getFileInfo() {
             return fileInfo;
+        }
+        public void setFileType(String fileType) {
+            this.fileType = fileType;
+        }
+        public String getFileType() {
+            return fileType;
         }
     }
 

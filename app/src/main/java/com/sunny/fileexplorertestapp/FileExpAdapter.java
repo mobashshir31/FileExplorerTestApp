@@ -40,7 +40,10 @@ public class FileExpAdapter extends ArrayAdapter<FileExpItem> {
             fileImageView.setImageResource(R.drawable.folder_icon);
         }
         else{
-            fileImageView.setImageResource(R.drawable.file_custom_icon);
+            if(item.getFileType()!=null && item.getFileType().startsWith("video/"))
+                fileImageView.setImageResource(R.drawable.video_file_icon);
+            else
+                fileImageView.setImageResource(R.drawable.file_custom_icon);
         }
         return customView;
     }
