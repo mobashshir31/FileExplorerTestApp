@@ -41,7 +41,7 @@ public class FileExpAdapter extends ArrayAdapter<FileExpItem> {
         }
         else{
             if(item.getFileType()!=null && item.getFileType().startsWith("video/"))
-                fileImageView.setImageResource(R.drawable.video_file_icon);
+                fileImageView.setImageResource(R.drawable.video_icon);
             else
                 fileImageView.setImageResource(R.drawable.file_custom_icon);
         }
